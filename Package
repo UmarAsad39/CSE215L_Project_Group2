@@ -1,0 +1,39 @@
+class Package{
+    private String[] hotel_name_rating_rent;
+    private String flight;
+    private boolean touristGuide;
+    private int days;
+    private double sum = 0;
+
+    public Package(String[] hotel_name_rating_rent, String flight, boolean touristGuide, int days) {
+        this.hotel_name_rating_rent = hotel_name_rating_rent;
+        this.flight = flight;
+        this.touristGuide = touristGuide;
+        this.days = days;
+    }
+    
+    public double calculateSum(){
+        sum+=(Integer.valueOf(hotel_name_rating_rent[2])*days);
+        
+        if(flight.equals("Economy")){
+            sum+=2000;
+        }
+        else if(flight.equals("Business")){
+            sum+=4000;
+        }
+        if(touristGuide==true){
+            sum+=1000;
+        }
+        return sum;
+    }
+    public String displayInfo(){
+        double moneh = calculateSum();
+        String DI = "Hotel: "+hotel_name_rating_rent[0]+"\n\n"+
+             "Rating: "+hotel_name_rating_rent[1]+" Stars\n\n"+
+             "Flight: "+flight+"\n\n"+
+             "Tourist Guide: "+touristGuide+"\n\n"+
+             "Days: "+days+"\n\n"+   
+             "Money: "+moneh;
+        return DI;
+    }
+}
