@@ -1,0 +1,688 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
+import javafx.application.Application;
+import static javafx.application.Application.launch;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+
+public class TravelKoro extends Application {
+    
+    @Override
+    public void start(Stage primaryStage) {
+        
+        primaryStage.setTitle("Travel Koro");
+        
+        Database database = new Database();
+        
+        //Login Scene Start//
+        Label usernameLabelLogin = new Label("Username");
+        Label passwordLabelLogin = new Label("Password");
+        TextField usernameTextLogin = new TextField();
+        PasswordField passwordPassLogin = new PasswordField();
+        Button loginButton = new Button("Login");
+        Button signupButton = new Button("Sign Up");
+        
+        VBox loginVertical = new VBox();
+        loginVertical.getChildren().addAll(usernameLabelLogin, usernameTextLogin, passwordLabelLogin, passwordPassLogin);
+        HBox loginHorizontal = new HBox();
+        loginHorizontal.getChildren().addAll(loginButton, signupButton);
+        loginHorizontal.setAlignment(Pos.CENTER);
+        loginHorizontal.setSpacing(10);
+        
+        GridPane loginGrid = new GridPane();
+        loginGrid.setAlignment(Pos.CENTER);
+        loginGrid.add(loginVertical, 0, 0);
+        loginGrid.add(loginHorizontal, 0, 1);
+        loginGrid.setVgap(10);//sets vertical gap amongst the fields, buttons and labels
+        Scene login = new Scene(loginGrid, 400, 350);
+        //Login Scene End//
+        
+        
+        
+        //Signup Scene Start//
+        Button back_SignupTOLogin = new Button("Back");
+        Button createAccount = new Button("Create Account");
+        Label usernameLabelSignup = new Label("Username");
+        Label passwordLabelSignup = new Label("Password");
+        TextField usernameTextSignup = new TextField();
+        PasswordField passwordPassSignup = new PasswordField();
+        
+        VBox signupVertical = new VBox();
+        signupVertical.getChildren().addAll(usernameLabelSignup, usernameTextSignup, passwordLabelSignup, passwordPassSignup);
+        HBox signupHorizontal = new HBox();
+        signupHorizontal.getChildren().addAll(createAccount);
+        signupHorizontal.setAlignment(Pos.CENTER);
+        
+        GridPane signupGrid = new GridPane();
+        signupGrid.setAlignment(Pos.CENTER);
+        signupGrid.add(signupVertical, 0, 0);
+        signupGrid.add(signupHorizontal, 0, 1);
+        signupGrid.setVgap(10);
+        
+        BorderPane signupBorder = new BorderPane();//basically combines VBox, HBox, GridPane to BorderPane
+        signupBorder.setCenter(signupGrid);
+        signupBorder.setTop(back_SignupTOLogin);
+        Scene signup = new Scene(signupBorder, 400, 350);
+        //Signup Scene End//
+        
+        
+        
+        //Login Error Scene Start//
+        Label errorLabel = new Label("Wrong Credentials and/or User Does Not Exist");
+        Button back_ErrorTOLogin = new Button("Back");
+        BorderPane errorBorder = new BorderPane();
+        errorBorder.setCenter(errorLabel);
+        errorBorder.setTop(back_ErrorTOLogin);
+        Scene error = new Scene(errorBorder, 400, 350);
+        //Login Error Scene End//
+        
+        
+        //Signup Error Scene Start//
+        Button backFrom_UserExists_TO_signup = new Button("Back");
+        Label error_User_Already_Exists = new Label("Username Already Exists. Please Change it by Adding Numbers to it :3");
+        BorderPane Error = new BorderPane();
+        Error.setTop(backFrom_UserExists_TO_signup);
+        Error.setCenter(error_User_Already_Exists);
+        Scene user_Already_Exists_Scene = new Scene(Error,400,350);
+        //Signup Error Scene End//
+        
+        
+        //Welcome Selection Start//
+        Label packageHasBeenAdded = new Label("Package has been added");
+        Label packageHasBeenRemoved = new Label("Package has been removed");
+        packageHasBeenAdded.setVisible(false);
+        packageHasBeenRemoved.setVisible(false);
+        Label User = new Label("Welcome");
+        Label Packages = new Label("Packages");
+        Button sylhet = new Button("Sylhet Hill Tracts");
+        Button cox = new Button("Cox's Bazar");
+        Button back_WelcomeTOLogin = new Button("Logout");
+        Button viewSelectedPackage = new Button("View Selected Package");
+        
+        VBox locationsV = new VBox();
+        locationsV.setAlignment(Pos.CENTER);
+        locationsV.getChildren().addAll(User, viewSelectedPackage, Packages, cox, sylhet, packageHasBeenAdded, packageHasBeenRemoved);
+        locationsV.setSpacing(15);
+        
+        BorderPane locationsBorder = new BorderPane();
+        locationsBorder.setCenter(locationsV);
+        locationsBorder.setTop(back_WelcomeTOLogin);
+        Scene Welcome = new Scene(locationsBorder,400,350);
+        //Welcome Selection End//
+        
+        
+        //Sylhet Prebuild Packages Start//
+        Button sylhet_LowBudget = new Button(database.sylhet_Low.displayInfo());
+        Button sylhet_MediumBudget = new Button(database.sylhet_Medium.displayInfo());
+        Button sylhet_HighBudget = new Button(database.sylhet_High.displayInfo());
+        Button backFrom_Sylhet_Package_TO_Welcome = new Button("Back");
+        Button sylhet_customPackages = new Button("Custom Package");
+        
+        HBox sylhetH = new HBox();
+        sylhetH.getChildren().addAll(sylhet_LowBudget,sylhet_MediumBudget,sylhet_HighBudget);
+        sylhetH.setSpacing(10);
+        sylhetH.setAlignment(Pos.CENTER);
+        
+        BorderPane sylhetPackageBorder = new BorderPane();
+        sylhetPackageBorder.setCenter(sylhetH);
+        sylhetPackageBorder.setTop(backFrom_Sylhet_Package_TO_Welcome);
+        sylhetPackageBorder.setBottom(sylhet_customPackages);
+        Scene SylhetPackage = new Scene(sylhetPackageBorder,400,350);
+        //Sylhet Prebuild Packages End//
+        
+        
+        //Sylhet Customiser Scene Start//
+        ToggleGroup sylhet_group = new ToggleGroup();
+        Label sylhet_hotel = new Label("Hotels:");
+        RadioButton sylhet_hotel1 = new RadioButton(database.getHotel_name_rating_rent_Sylhet()[0][0]);
+        RadioButton sylhet_hotel2 = new RadioButton(database.getHotel_name_rating_rent_Sylhet()[1][0]);
+        sylhet_hotel1.setSelected(true);
+        sylhet_hotel1.setToggleGroup(sylhet_group);
+        sylhet_hotel2.setToggleGroup(sylhet_group);
+        VBox sylhet_hotel_Options = new VBox();
+        sylhet_hotel_Options.getChildren().addAll(sylhet_hotel,sylhet_hotel1,sylhet_hotel2);
+        sylhet_hotel_Options.setAlignment(Pos.CENTER);
+        sylhet_hotel_Options.setSpacing(10);
+        
+        ToggleGroup sylhet_flightGrp = new ToggleGroup();
+        Label sylhet_flight_Label = new Label("Flights:");
+        RadioButton sylhet_flight1 = new RadioButton("Economy");
+        RadioButton sylhet_flight2 = new RadioButton("Business");
+        sylhet_flight1.setSelected(true);
+        sylhet_flight1.setToggleGroup(sylhet_flightGrp);
+        sylhet_flight2.setToggleGroup(sylhet_flightGrp);
+        VBox sylhet_flight_Options = new VBox();
+        sylhet_flight_Options.getChildren().addAll(sylhet_flight_Label,sylhet_flight1,sylhet_flight2);
+        sylhet_flight_Options.setAlignment(Pos.CENTER);
+        sylhet_flight_Options.setSpacing(10);
+        
+        CheckBox sylhet_touristGuide = new CheckBox("Tourist Guide");
+        VBox sylhet_tourist_Vbox = new VBox();
+        sylhet_tourist_Vbox.getChildren().add(sylhet_touristGuide);
+        sylhet_tourist_Vbox.setAlignment(Pos.CENTER);
+        
+        Button sylhet_Calculate = new Button("Calculate Cash");
+        TextField sylhet_Days = new TextField();
+        sylhet_Days.setPromptText("Number of Days");
+        sylhet_Days.setMaxWidth(100);
+        sylhet_Days.setAlignment(Pos.CENTER);
+        sylhet_Calculate.setAlignment(Pos.BOTTOM_CENTER);
+        VBox sylhet_Bottom_Options = new VBox();
+        sylhet_Bottom_Options.getChildren().addAll(sylhet_Days, sylhet_Calculate);
+        sylhet_Bottom_Options.setAlignment(Pos.CENTER);
+        sylhet_Bottom_Options.setSpacing(30);
+        
+        Button backFrom_Sylhet_Customisable_TO_Sylhet_Package = new Button("Back");
+        
+        HBox sylhet_Horizontal_Options = new HBox();
+        sylhet_Horizontal_Options.getChildren().addAll(sylhet_hotel_Options,sylhet_flight_Options,sylhet_tourist_Vbox);
+        sylhet_Horizontal_Options.setSpacing(40);
+        sylhet_Horizontal_Options.setAlignment(Pos.CENTER);
+        
+        BorderPane sylhet_customisable_Border = new BorderPane();
+        sylhet_customisable_Border.setCenter(sylhet_Horizontal_Options);
+        sylhet_customisable_Border.setBottom(sylhet_Bottom_Options);
+        sylhet_customisable_Border.setTop(backFrom_Sylhet_Customisable_TO_Sylhet_Package);
+        
+        Scene SylhetCustomizer = new Scene(sylhet_customisable_Border,400,350);
+        //Sylhet Customiser Scene End//
+        
+        
+        
+        //Cox's Prebuild Package Scene Start//
+        Button cox_LowBudget = new Button(database.cox_Low.displayInfo());
+        Button cox_MediumBudget = new Button(database.cox_Medium.displayInfo());
+        Button cox_HighBudget = new Button(database.cox_High.displayInfo());
+        Button backFrom_Cox_Package_TO_Welcome = new Button("Back");
+        Button cox_customPackages = new Button("Custom Package");
+        
+        HBox coxH = new HBox();
+        coxH.getChildren().addAll(cox_LowBudget,cox_MediumBudget,cox_HighBudget);
+        coxH.setSpacing(10);
+        coxH.setAlignment(Pos.CENTER);
+        
+        BorderPane coxPackageBorder = new BorderPane();
+        coxPackageBorder.setCenter(coxH);
+        coxPackageBorder.setTop(backFrom_Cox_Package_TO_Welcome);
+        coxPackageBorder.setBottom(cox_customPackages);
+        Scene CoxPackage = new Scene(coxPackageBorder,400,350);
+        //Cox's Prebuild Package Scene End//
+        
+        
+        //Cox's Customizer Scene Start//
+        ToggleGroup cox_group = new ToggleGroup();
+        Label cox_hotel = new Label("Hotels:");
+        RadioButton cox_hotel1 = new RadioButton(database.getHotel_name_rating_rent_Cox()[0][0]);
+        RadioButton cox_hotel2 = new RadioButton(database.getHotel_name_rating_rent_Cox()[1][0]);
+        cox_hotel1.setSelected(true);
+        cox_hotel1.setToggleGroup(cox_group);
+        cox_hotel2.setToggleGroup(cox_group);
+        VBox cox_hotel_Options = new VBox();
+        cox_hotel_Options.getChildren().addAll(cox_hotel,cox_hotel1,cox_hotel2);
+        cox_hotel_Options.setAlignment(Pos.CENTER);
+        cox_hotel_Options.setSpacing(10);
+        
+        ToggleGroup cox_flightGrp = new ToggleGroup();
+        Label cox_flight_Label = new Label("Flights:");
+        RadioButton cox_flight1 = new RadioButton("Economy");
+        RadioButton cox_flight2 = new RadioButton("Business");
+        cox_flight1.setSelected(true);
+        cox_flight1.setToggleGroup(cox_flightGrp);
+        cox_flight2.setToggleGroup(cox_flightGrp);
+        VBox cox_flight_Options = new VBox();
+        cox_flight_Options.getChildren().addAll(cox_flight_Label,cox_flight1,cox_flight2);
+        cox_flight_Options.setAlignment(Pos.CENTER);
+        cox_flight_Options.setSpacing(10);
+        
+        CheckBox cox_touristGuide = new CheckBox("Tourist Guide");
+        VBox cox_tourist_Vbox = new VBox();
+        cox_tourist_Vbox.getChildren().add(cox_touristGuide);
+        cox_tourist_Vbox.setAlignment(Pos.CENTER);
+        
+        Button cox_Calculate = new Button("Calculate Cash");
+        TextField cox_Days = new TextField();
+        cox_Days.setPromptText("Number of Days");
+        cox_Days.setMaxWidth(100);
+        cox_Days.setAlignment(Pos.CENTER);
+        cox_Calculate.setAlignment(Pos.BOTTOM_CENTER);
+        VBox cox_Bottom_Options = new VBox();
+        cox_Bottom_Options.getChildren().addAll(cox_Days, cox_Calculate);
+        cox_Bottom_Options.setAlignment(Pos.CENTER);
+        cox_Bottom_Options.setSpacing(30);
+        
+        Button backFrom_Cox_Customisable_TO_Cox_Package = new Button("Back");
+        
+        HBox cox_Horizontal_Options = new HBox();
+        cox_Horizontal_Options.getChildren().addAll(cox_hotel_Options,cox_flight_Options,cox_tourist_Vbox);
+        cox_Horizontal_Options.setSpacing(40);
+        cox_Horizontal_Options.setAlignment(Pos.CENTER);
+        
+        BorderPane cox_customisable_Border = new BorderPane();
+        cox_customisable_Border.setCenter(cox_Horizontal_Options);
+        cox_customisable_Border.setBottom(cox_Bottom_Options);
+        cox_customisable_Border.setTop(backFrom_Cox_Customisable_TO_Cox_Package);
+        
+        Scene CoxCustomizer = new Scene(cox_customisable_Border,400,350);
+        //Cox's Customiser Scene End//
+        
+        
+        //THE BACK BUTTONS(The names of the buttons are self explanatory)
+        backFrom_UserExists_TO_signup.setOnAction(e->{
+            usernameTextSignup.setText(null);
+            passwordPassSignup.setText(null);//these have been nulled so that 
+                                            //information doesn't remain in the text/password fields
+            primaryStage.setScene(signup);
+        });
+        back_SignupTOLogin.setOnAction(e -> {
+            usernameTextLogin.setText(null);
+            passwordPassLogin.setText(null);
+            primaryStage.setScene(login);
+        });
+        back_ErrorTOLogin.setOnAction(e -> {
+            usernameTextLogin.setText(null);
+            passwordPassLogin.setText(null);
+            primaryStage.setScene(login);
+        });
+        back_WelcomeTOLogin.setOnAction(e -> {
+            usernameTextLogin.setText(null);
+            passwordPassLogin.setText(null);
+            packageHasBeenAdded.setVisible(false);//removes the package has been added label
+            primaryStage.setScene(login);
+        });
+        backFrom_Sylhet_Package_TO_Welcome.setOnAction(e ->{
+            primaryStage.setScene(Welcome);
+        });
+        backFrom_Sylhet_Customisable_TO_Sylhet_Package.setOnAction(e -> {
+            primaryStage.setScene(SylhetPackage);
+        });
+        backFrom_Cox_Package_TO_Welcome.setOnAction(e -> {
+            primaryStage.setScene(Welcome);
+        });
+        backFrom_Cox_Customisable_TO_Cox_Package.setOnAction(e -> {
+            primaryStage.setScene(CoxPackage);
+        });
+        //
+        
+        loginButton.setOnAction(e -> {
+            boolean userFound = login(usernameTextLogin.getText(), passwordPassLogin.getText());
+            if(userFound==false){
+                primaryStage.setScene(error);
+            }
+            else{
+                primaryStage.setScene(Welcome);
+            }
+        });
+        
+        signupButton.setOnAction(e -> {
+            usernameTextSignup.setText(null);
+            passwordPassSignup.setText(null);
+            primaryStage.setScene(signup);
+        });
+        
+        createAccount.setOnAction(e ->{
+            boolean user_Already_Exists = signup(usernameTextSignup.getText(),passwordPassSignup.getText());
+            if(user_Already_Exists == false){
+                usernameTextLogin.setText(null);
+                passwordPassLogin.setText(null);
+                primaryStage.setScene(login);
+            }
+            else{
+                primaryStage.setScene(user_Already_Exists_Scene);//shows error scene
+            }
+        });
+        
+        sylhet.setOnAction(e->{
+            primaryStage.setScene(SylhetPackage);
+        });
+        
+        sylhet_LowBudget.setOnAction(e->{
+            addPackage(usernameTextLogin.getText(),sylhet_LowBudget.getText());//calls addPackage function
+            packageHasBeenAdded.setVisible(true);
+            packageHasBeenRemoved.setVisible(false);//shows the package added label only after clicking
+            primaryStage.setScene(Welcome);
+        });
+        
+        sylhet_MediumBudget.setOnAction(e->{
+            addPackage(usernameTextLogin.getText(),sylhet_MediumBudget.getText());
+            packageHasBeenAdded.setVisible(true);
+            packageHasBeenRemoved.setVisible(false);
+            primaryStage.setScene(Welcome);
+        });
+        
+        sylhet_HighBudget.setOnAction(e->{
+            addPackage(usernameTextLogin.getText(),sylhet_HighBudget.getText());
+            packageHasBeenAdded.setVisible(true);
+            packageHasBeenRemoved.setVisible(false);
+            primaryStage.setScene(Welcome);
+        });
+        
+        cox.setOnAction(e->{
+            primaryStage.setScene(CoxPackage);
+        });
+        
+        cox_LowBudget.setOnAction(e->{
+            addPackage(usernameTextLogin.getText(),cox_LowBudget.getText());
+            packageHasBeenAdded.setVisible(true);
+            packageHasBeenRemoved.setVisible(false);
+            primaryStage.setScene(Welcome);
+        });
+        
+        cox_MediumBudget.setOnAction(e->{
+            addPackage(usernameTextLogin.getText(),cox_MediumBudget.getText());
+            packageHasBeenAdded.setVisible(true);
+            packageHasBeenRemoved.setVisible(false);
+            primaryStage.setScene(Welcome);
+        });
+        
+        cox_HighBudget.setOnAction(e->{
+            addPackage(usernameTextLogin.getText(),cox_HighBudget.getText());
+            packageHasBeenAdded.setVisible(true);
+            packageHasBeenRemoved.setVisible(false);
+            primaryStage.setScene(Welcome);
+        });
+        
+        sylhet_customPackages.setOnAction(e->{
+            primaryStage.setScene(SylhetCustomizer);
+            
+        });
+        
+        sylhet_Calculate.setOnAction(e->{//sylhet custom package budget calculator button
+            String[] hotel = null; String flight = null; boolean touristGuide=false; int days = 0;
+            
+            if(sylhet_hotel1.isSelected()){//checks which hotel is selected
+                hotel = database.getHotel_name_rating_rent_Sylhet()[0];
+            }
+            else if(sylhet_hotel2.isSelected()){
+                hotel = database.getHotel_name_rating_rent_Sylhet()[1];
+            }
+            if(sylhet_flight1.isSelected()){//which flight is selected
+                flight = "Economy";
+            }
+            else if(sylhet_flight2.isSelected()){
+                flight = "Business";
+            }
+            if(sylhet_touristGuide.isSelected()){//if tourist guide is selected
+                touristGuide = true;
+            }
+            if(Integer.valueOf(sylhet_Days.getText())!=null){
+                days = Integer.valueOf(sylhet_Days.getText());//converts the days textfield string into integer
+            }
+            
+            //creates a button which displays the information of the custom package
+            Button custom_Btn = new Button(database.createPackage(hotel, flight, touristGuide, days).displayInfo());
+            custom_Btn.setAlignment(Pos.CENTER);
+            custom_Btn.setPrefWidth(100);
+            Scene custom_scene = new Scene(custom_Btn,400,350);
+            primaryStage.setScene(custom_scene);
+            
+            custom_Btn.setOnAction(f-> {
+                addPackage(usernameTextLogin.getText(),custom_Btn.getText());
+                packageHasBeenAdded.setVisible(true);
+                packageHasBeenRemoved.setVisible(false);
+                primaryStage.setScene(Welcome);
+                /*When the button is pressed, addPackage is called which takes in the button's text information as 
+                parameter and changes to the Welcome scene*/
+            });
+        });
+        
+        cox_customPackages.setOnAction(e->{
+            primaryStage.setScene(CoxCustomizer);
+            
+        });
+        
+        cox_Calculate.setOnAction(e->{//same mechanism as Sylhet customizer
+            
+            String[] hotel = null; String flight = null; boolean touristGuide=false; int days = 0;
+            
+            if(cox_hotel1.isSelected()){
+                hotel = database.getHotel_name_rating_rent_Cox()[0];
+            }
+            else if(cox_hotel2.isSelected()){
+                hotel = database.getHotel_name_rating_rent_Cox()[1];
+            }
+            if(cox_flight1.isSelected()){
+                flight = "Economy";
+            }
+            else if(cox_flight2.isSelected()){
+                flight = "Business";
+            }
+            if(cox_touristGuide.isSelected()){
+                touristGuide = true;
+            }
+            if(Integer.valueOf(cox_Days.getText())!=null){
+                days = Integer.valueOf(cox_Days.getText());
+            }
+            
+            Button custom_Btn = new Button(database.createPackage(hotel, flight, touristGuide, days).displayInfo());
+            custom_Btn.setAlignment(Pos.CENTER);
+            custom_Btn.setPrefWidth(100);
+            Scene custom_scene = new Scene(custom_Btn,400,350);
+            primaryStage.setScene(custom_scene);
+            
+            custom_Btn.setOnAction(f-> {
+                addPackage(usernameTextLogin.getText(),custom_Btn.getText());
+                packageHasBeenAdded.setVisible(true);
+                packageHasBeenRemoved.setVisible(false);
+                primaryStage.setScene(Welcome);
+            });
+        });
+        
+        
+        viewSelectedPackage.setOnAction(e->{
+            //opens a file based on the username
+            File user = new File(usernameTextLogin.getText()+".txt");
+            try{
+                Scanner sc = new Scanner(user);
+                String line = "";
+                Label display = new Label();
+                while(sc.hasNextLine()){
+                    line+=sc.nextLine()+"\n";//scans it and adds every line to a line string
+                }
+                display.setText(line);//fills the label with the line string
+                display.setAlignment(Pos.CENTER);
+                
+                Button backFrom_View_TO_Welcome = new Button("Back");
+                Button removePackage = new Button("Remove Package");
+                BorderPane view = new BorderPane();
+                view.setCenter(display);
+                view.setTop(backFrom_View_TO_Welcome);
+                view.setBottom(removePackage);
+                Scene viewSelectedPackageScene = new Scene(view,400,350);
+                primaryStage.setScene(viewSelectedPackageScene);
+                
+                
+                backFrom_View_TO_Welcome.setOnAction(f->{//self explanatory back button
+                    primaryStage.setScene(Welcome);
+                });
+                removePackage.setOnAction(f->{
+                    removePackage(usernameTextLogin.getText());//calls the removePackage function
+                    packageHasBeenAdded.setVisible(false);
+                    packageHasBeenRemoved.setVisible(true);
+                    primaryStage.setScene(Welcome);
+                    
+                });
+            }
+            catch (IOException ex) {
+                /*pretty unneccessary as when the user signs up a file under his/her username is
+                already created so there will no be an IO Exception to begin with but since it is
+                a checked exception had to add it here*/
+            }
+            
+        });
+        
+        
+        primaryStage.setScene(login);//the first scene to display
+        primaryStage.show();
+    }
+
+    
+    public static void main(String[] args) {
+        launch(args);
+    }
+    
+    public static boolean login(String username, String password){
+        boolean userFound = false;
+        File acc = new File("Accounts.txt");//it aint case sensitive future Jiad, this is yo issue
+        try{
+            Scanner sc = new Scanner(acc);
+            while(sc.hasNextLine()){
+                String line = sc.nextLine();
+                String[] values = line.split("\t");
+                if(username.equals(values[0])){
+                    if(password.equals(values[1])){
+                        userFound = true;
+                        break;
+                    }
+                }
+            }
+        }
+        finally{
+            return userFound;
+        }
+    }
+    
+    public static boolean signup(String username, String password){
+        boolean user_Already_Exists_OR_Taken = false;
+        try{
+            user_Already_Exists_OR_Taken = login(username, password);
+            if(user_Already_Exists_OR_Taken == false){
+                File acc = new File("Accounts.txt");
+                acc.createNewFile();
+                FileWriter fw = new FileWriter(acc,true);
+                fw.write(username+"\t"+password+"\n");
+                fw.close();
+                File user = new File(username+".txt");
+                user.createNewFile();
+            }
+            
+        }
+        catch(Exception e){
+            
+        }
+        finally{
+            return user_Already_Exists_OR_Taken;
+        }
+    }
+    
+    public static void addPackage(String username, String packageInfo){
+        /*writes the package details to the user's dedicated file*/
+        File user = new File(username+".txt");
+        try{
+            FileWriter fw = new FileWriter(user);
+            fw.write(packageInfo);
+            fw.close();
+        }
+        catch (IOException ex) {
+            /*Once again, no way to get to the Welcome page without signing up so
+            the file must be there but it's a checked exception*/
+        }
+    }
+    
+    public static void removePackage(String username){
+        File user = new File(username+".txt");
+        try{
+            FileWriter fw = new FileWriter(user);
+            fw.write("");//replaces the file contents with nothing
+            fw.close();
+        }
+        catch(IOException ex){
+            //same as addPackage catch block
+        }
+    }
+    
+}
+
+class Database{
+    
+    private final String[][] hotel_name_rating_rent_Sylhet = {
+        {"S1","5","5000"},
+        {"S2","4","3000"}
+    };
+    private final String[][] hotel_name_rating_rent_Cox = {
+        {"C1","5","6000"},
+        {"C2","4","5000"}
+    };
+    private final String[] flight = {"Economy","Business"};
+    
+    public Database(){}
+
+    public String[][] getHotel_name_rating_rent_Sylhet() {
+        return hotel_name_rating_rent_Sylhet;
+    }
+
+    public String[][] getHotel_name_rating_rent_Cox() {
+        return hotel_name_rating_rent_Cox;
+    }
+
+    public String[] getFlight() {
+        return flight;
+    }
+    
+    Package sylhet_High = new Package(hotel_name_rating_rent_Sylhet[0],flight[1],true,3);
+    Package sylhet_Medium = new Package(hotel_name_rating_rent_Sylhet[0],flight[0],true,3);
+    Package sylhet_Low = new Package(hotel_name_rating_rent_Sylhet[1],flight[0],false,3);
+    
+    Package cox_High = new Package(hotel_name_rating_rent_Cox[0],flight[1],true, 3);
+    Package cox_Medium = new Package(hotel_name_rating_rent_Cox[0],flight[0],true, 3);
+    Package cox_Low = new Package(hotel_name_rating_rent_Cox[1],flight[0],false, 3);
+    
+    public Package createPackage(String[] hotel_name_rating_rent, String flight, boolean touristGuide, int days){
+        Package customPackage = new Package(hotel_name_rating_rent, flight, touristGuide, days);
+        return customPackage;
+    }
+}
+
+class Package{
+    private String[] hotel_name_rating_rent;
+    private String flight;
+    private boolean touristGuide;
+    private int days;
+    private double sum = 0;
+
+    public Package(String[] hotel_name_rating_rent, String flight, boolean touristGuide, int days) {
+        this.hotel_name_rating_rent = hotel_name_rating_rent;
+        this.flight = flight;
+        this.touristGuide = touristGuide;
+        this.days = days;
+    }
+    
+    public double calculateSum(){
+        sum+=(Integer.valueOf(hotel_name_rating_rent[2])*days);
+        
+        if(flight.equals("Economy")){
+            sum+=2000;
+        }
+        else if(flight.equals("Business")){
+            sum+=4000;
+        }
+        if(touristGuide==true){
+            sum+=1000;
+        }
+        return sum;
+    }
+    public String displayInfo(){
+        double moneh = calculateSum();
+        String DI = "Hotel: "+hotel_name_rating_rent[0]+"\n\n"+
+             "Rating: "+hotel_name_rating_rent[1]+" Stars\n\n"+
+             "Flight: "+flight+"\n\n"+
+             "Tourist Guide: "+touristGuide+"\n\n"+
+             "Days: "+days+"\n\n"+   
+             "Money: "+moneh;
+        return DI;
+    }
+}
