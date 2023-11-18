@@ -1,0 +1,39 @@
+class Database{
+    
+    private final String[][] hotel_name_rating_rent_Sylhet = {
+        {"S1","5","5000"},
+        {"S2","4","3000"}
+    };
+    private final String[][] hotel_name_rating_rent_Cox = {
+        {"C1","5","6000"},
+        {"C2","4","5000"}
+    };
+    private final String[] flight = {"Economy","Business"};
+    
+    public Database(){}
+
+    public String[][] getHotel_name_rating_rent_Sylhet() {
+        return hotel_name_rating_rent_Sylhet;
+    }
+
+    public String[][] getHotel_name_rating_rent_Cox() {
+        return hotel_name_rating_rent_Cox;
+    }
+
+    public String[] getFlight() {
+        return flight;
+    }
+    
+    Package sylhet_High = new Package(hotel_name_rating_rent_Sylhet[0],flight[1],true,3);
+    Package sylhet_Medium = new Package(hotel_name_rating_rent_Sylhet[0],flight[0],true,3);
+    Package sylhet_Low = new Package(hotel_name_rating_rent_Sylhet[1],flight[0],false,3);
+    
+    Package cox_High = new Package(hotel_name_rating_rent_Cox[0],flight[1],true, 3);
+    Package cox_Medium = new Package(hotel_name_rating_rent_Cox[0],flight[0],true, 3);
+    Package cox_Low = new Package(hotel_name_rating_rent_Cox[1],flight[0],false, 3);
+    
+    public Package createPackage(String[] hotel_name_rating_rent, String flight, boolean touristGuide, int days){
+        Package customPackage = new Package(hotel_name_rating_rent, flight, touristGuide, days);
+        return customPackage;
+    }
+}
